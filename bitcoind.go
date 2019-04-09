@@ -24,7 +24,7 @@ type Bitcoind struct {
 // New return a new bitcoind
 func New(host string, port int, user, passwd string, useSSL bool, timeoutParam ...int) (*Bitcoind, error) {
 	var timeout int = RPCCLIENT_TIMEOUT
-	// If the timeout is specified in timeoutParam, allow it. 
+	// If the timeout is specified in timeoutParam, allow it.
 	if len(timeoutParam) != 0 {
 		timeout = timeoutParam[0]
 	}
@@ -311,7 +311,7 @@ type VerboseTx struct {
 	ModifiedFee float64
 	// Local time when tx entered pool
 	Time uint32
-	// Block height when tx entered pool 
+	// Block height when tx entered pool
 	Height uint32
 	// Number of inpool descendents (including this one)
 	DescendantCount uint32
@@ -345,23 +345,13 @@ func (b *Bitcoind) GetRawMempoolVerbose() (txs map[string]VerboseTx, err error) 
 	return
 }
 
-// GetRawTransaction returns raw transaction representation for given transaction id.
-func (b *Bitcoind) GetRawTransaction(txId string, verbose bool) (rawTx interface{}, err error) {
-	intVerbose := 0
-	if verbose {
-		intVerbose = 1
-	}
-	r, err := b.client.call("getrawtransaction", []interface{}{txId, intVerbose})
+// GetRawTransaction returns a Bitcoind.Transation struct about the given transaction
+func (b *Bitcoind) GetRawTransaction(txid string) (transaction RawTransaction, err error) {
+	r, err := b.client.call("getrawtransaction", []interface{}{txid, 1})
 	if err = handleError(err, &r); err != nil {
 		return
 	}
-	if !verbose {
-		err = json.Unmarshal(r.Result, &rawTx)
-	} else {
-		var t RawTransaction
-		err = json.Unmarshal(r.Result, &t)
-		rawTx = t
-	}
+	err = json.Unmarshal(r.Result, &transaction)
 	return
 }
 
@@ -742,4 +732,3 @@ func (b *Bitcoind) WalletPassphraseChange(oldPassphrase, newPassprhase string) e
 	r, err := b.client.call("walletpassphrasechange", []interface{}{oldPassphrase, newPassprhase})
 	return handleError(err, &r)
 }
- 
