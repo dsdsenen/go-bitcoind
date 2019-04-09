@@ -345,7 +345,7 @@ func (b *Bitcoind) GetRawMempoolVerbose() (txs map[string]VerboseTx, err error) 
 	return
 }
 
-// GetRawTransaction returns a Bitcoind.Transation struct about the given transaction
+// GetRawTransaction returns a Bitcoind.Transation struct about the given transactio n
 func (b *Bitcoind) GetRawTransaction(txid string) (transaction RawTransaction, err error) {
 	r, err := b.client.call("getrawtransaction", []interface{}{txid, 1})
 	if err = handleError(err, &r); err != nil {
